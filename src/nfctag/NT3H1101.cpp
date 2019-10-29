@@ -29,6 +29,10 @@
 
 #include "NT3H1101.h"
 
+#define _STR(x) #x
+#define STRINGIFY(x)    _STR(x)
+#define NXPNFC_DEVICE "/dev/i2c-" STRINGIFY(NXPNFC_BUS)
+
 /*
  * this file has been extensively modified from the SmartEverything source
  * to handle i2c transfers via the Linux i2c library instead of
@@ -36,7 +40,7 @@
  * Borrows heavily on the MFI library in the ADK
  */
 
-static const char *i2c_device = "/dev/i2c-2";
+static const char *i2c_device = NXPNFC_DEVICE;
 static int i2c = -1;
 static uint16_t base_i2c_flags = 0;
 

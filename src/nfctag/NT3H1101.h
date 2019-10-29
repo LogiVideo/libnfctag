@@ -20,17 +20,16 @@
 #ifndef NT3H1101_h
 #define NT3H1101_h
 
+#include "config.h"
 #include "nfctag/NT3H1101_model.h"
 #include "SmeNfc.h"
 
-#define NXPNFC_ADDRESS 0x55
-// TODO: make this an autoconf / automake variable
+#ifndef NXPNFC_ADDRESS
+#error No chip address specified
+#endif
 
 #define MANUFACTURING_DATA_REG 0x0
 #define USER_START_REG 0x1
-
-#define NT3H1101_DEF 1          // default to the 1K version
-// TODO: make this an autoconf / automake variable
 
 #ifdef NT3H1201_DEF             // for the 2K
 #define USER_END_REG   0x77
