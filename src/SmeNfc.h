@@ -8,6 +8,7 @@
  * -------------------
  *
  * Copyright (c) Amel Technology. All right reserved.
+ * Copyright (c) Logitech Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,54 +29,51 @@
 #ifndef NFC_H_
 #define NFC_H_
 
-
-#include <Arduino.h>
-
+#include <stdint.h>
 #include "nfc/NT3H1101.h"
 
 typedef enum {
-    NDEFFirstPos,
-    NDEFMiddlePos,
-    NDEFLastPos
+        NDEFFirstPos,
+        NDEFMiddlePos,
+        NDEFLastPos
 } RecordPosEnu;
 
-
-
 typedef struct {
-    RecordPosEnu ndefPosition;
-    byte rtdType;
-    byte *rtdPayload;
-    byte rtdPayloadlength;
-    void    *specificRtdData;
-}NDEFDataStr;
-
+        RecordPosEnu ndefPosition;
+        uint8_t rtdType;
+        uint8_t *rtdPayload;
+        uint8_t rtdPayloadlength;
+        void *specificRtdData;
+} NDEFDataStr;
 
 class SmeNfc {
-public:
-    SmeNfc();
-    virtual ~SmeNfc();
-    
-    /*
-     * The function write in the NT3H a new URI Rtd on the required position
+ public:
+        SmeNfc();
+        virtual ~ SmeNfc();
+
+    /**
+     * Write in the NT3H a new URI Rtd of the requested type at the
+     * required position. This function examines the given URI to determine
+     * if it is a complete URI (contains ://) or not, in which case it
+     * assumes https://www. should be prefixed.
      *
      * param:
      *      position: where add the record
-     *      http:     the address to write
+     *      uri:      the address to write
      *
      */
-    bool storeUrihttp(RecordPosEnu position, char *http);
+        bool storeUri(RecordPosEnu position, const char *uri);
 
-
-    /*
-     * The function write in the NT3H a new Text Rtd on the required position
+    /**
+     * Write in the NT3H a new Text Rtd at the required position
      *
      * param:
      *      position: where add the record
      *      text:     the text to write
      *
      */
-    bool storeText(RecordPosEnu position,char *text);
+        bool storeText(RecordPosEnu position, const char *text);
 };
 
 extern SmeNfc smeNfc;
-#endif /* NFC_H_ */
+#endif                          /* NFC_H_ */

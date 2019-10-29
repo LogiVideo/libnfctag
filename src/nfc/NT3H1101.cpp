@@ -1,81 +1,170 @@
+/*
+ * Copyright (c) Amel Technology. All right reserved.
+ * Copyright (c) Logitech Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+#include <linux/i2c.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#include <cstdio>
+#include <cerrno>
+#include <cstring>
+#include <vector>
+
 #include "NT3H1101.h"
-#include <Arduino.h>
-#include <Wire.h>
 
+/*
+ * this file has been extensively modified from the SmartEverything source
+ * to handle i2c transfers via the Linux i2c library instead of
+ * the Arduino "Wire" library.
+ * Borrows heavily on the MFI library in the ADK
+ */
 
-static bool readRegisters(byte slaveAddress, byte regToRead, int bytesToRead, byte * dest)
+static const char *i2c_device = "/dev/i2c-2";
+static int i2c = -1;
+static uint16_t base_i2c_flags = 0;
+
+static bool i2c_open(const char *dev)
 {
-	Wire.beginTransmission(slaveAddress);
-	Wire.write(regToRead);
-	Wire.endTransmission(false); //endTransmission but keep the connection active
-
-	uint8_t bytes = Wire.requestFrom(slaveAddress, bytesToRead); //Ask for bytes, once done, bus is released by default
-
-	// return with error if not readsy
-	if (bytes ==0)
-	return false;
-
-	while(Wire.available() < bytesToRead); //Hang out until we get the # of bytes we expect
-
-	for(int x = 0 ; x < bytesToRead ; x++) {
-		dest[x] = Wire.read();
-	}
-
-	Wire.endTransmission(true);
-
-	return true; //
+        if (i2c < 0) {
+                i2c = open(dev, O_RDWR);
+        }
+        return i2c >= 0;
 }
 
-static bool writeBufferRegister(uint8_t slaveAddress, byte regToWrite, const uint8_t* dataToWrite, uint16_t dataLen) {
-	Wire.beginTransmission(slaveAddress);
+using Batch = std::vector < i2c_msg >;
 
-	if (!Wire.write(regToWrite))
-	return false;
+static bool process_batch(Batch && batch)
+{
+        if (!i2c_open(i2c_device))
+                return false;
+        for (auto && msg:batch) {
+                // Process all I2C commands, retrying each one if necessary
+                bool ok { };
 
-	if (Wire.write(dataToWrite, dataLen)!= dataLen)
-	return false;
+                for (auto sleep_us = 500; sleep_us < 1024000; sleep_us *= 2) {
 
-	if (Wire.endTransmission()!=0) //Stop transmitting
-	return false;
+                        auto msgs = i2c_rdwr_ioctl_data { &msg, 1 };
+                        ok =::ioctl(i2c, I2C_RDWR, &msgs) >= 1;
+                        if (ok)
+                                break;  // Success, no need to retry
 
-	return true;
+                        if (errno == ENXIO || errno == EBUSY) {
+                                // Implement an exponential backoff
+                                usleep(sleep_us);
+                                continue;
+                        } else {
+                                std::printf("Failed: %m\n");
+                                return false;
+                        }
+                }
+
+                if (!ok) {
+                        return false;
+                }
+        }
+        return true;
 }
 
-bool NT3H1101_C::readManufacturingData(uint8_t nfcPageBuffer[]) {
-    return readRegisters(_address, MANUFACTURING_DATA_REG, NFC_PAGE_SIZE, nfcPageBuffer);
+static bool writeBufferRegister(uint8_t slaveAddress, uint8_t regToWrite,
+                                const uint8_t * dataToWrite, uint16_t dataLen)
+{
+        // Prepare the I2C commands
+        uint8_t write_buffer[dataLen + 1];
+
+        write_buffer[0] = regToWrite;
+        memcpy(&write_buffer[1], dataToWrite, dataLen);
+        /*std::printf("i2ctransfer 2 w%d@0x%02x ", dataLen + 1, slaveAddress);
+        for (int i = 0; i < dataLen + 1; i++) {
+                std::printf("0x%02x ", write_buffer[i]);
+        }
+        std::printf("\n");
+        */
+        Batch batch {
+                i2c_msg {
+        slaveAddress, base_i2c_flags, ++dataLen, write_buffer}};
+        return process_batch(std::move(batch));
 }
 
-bool NT3H1101_C::readUID(uint8_t nfcPageBuffer[]) {
-    return readRegisters(_address, MANUFACTURING_DATA_REG, UID_SIZE, nfcPageBuffer);
+static bool readRegisters(uint8_t slaveAddress, uint8_t regToRead,
+                          int bytesToRead, uint8_t * dest)
+{
+        // Prepare the I2C commands
+        Batch batch {
+                i2c_msg {
+        slaveAddress, base_i2c_flags, 1, (uint8_t *) & regToRead}};
+        while (bytesToRead > 0) {
+                int16_t seg_len = std::min(bytesToRead, NFC_PAGE_SIZE);
+
+                batch.emplace_back(i2c_msg {
+                                   slaveAddress,
+                                   (uint16_t) (I2C_M_RD | base_i2c_flags),
+                                   (uint16_t) seg_len, dest}
+                );
+                dest = dest + seg_len;
+                bytesToRead -= seg_len;
+        }
+
+        return process_batch(std::move(batch));
 }
 
-bool NT3H1101_C::readUserPage(uint8_t userPagePtr, uint8_t nfcPageBuffer[]) {
-    uint8_t reg = USER_START_REG+userPagePtr;
+bool NT3H1101_C::readManufacturingData(uint8_t nfcPageBuffer[])
+{
+        return readRegisters(_address, MANUFACTURING_DATA_REG, NFC_PAGE_SIZE,
+                             nfcPageBuffer);
+}
 
-    // if the requested page is out of the register exit with error
-	if (reg > USER_END_REG) {
-		return false;
-	}
+bool NT3H1101_C::readUID(uint8_t nfcPageBuffer[])
+{
+        return readRegisters(_address, MANUFACTURING_DATA_REG, UID_SIZE,
+                             nfcPageBuffer);
+}
 
-    return  readRegisters(_address, reg, NFC_PAGE_SIZE, nfcPageBuffer);
+bool NT3H1101_C::readUserPage(uint8_t userPagePtr, uint8_t nfcPageBuffer[])
+{
+        uint8_t reg = USER_START_REG + userPagePtr;
+
+        // if the requested page is out of the register exit with error
+        if (reg > USER_END_REG) {
+                return false;
+        }
+
+        return readRegisters(_address, reg, NFC_PAGE_SIZE, nfcPageBuffer);
 
 }
 
-bool NT3H1101_C::writeUserPage(uint8_t userPagePtr, const uint8_t nfcPageBuffer[]) {
+bool NT3H1101_C::writeUserPage(uint8_t userPagePtr,
+                               const uint8_t nfcPageBuffer[])
+{
 
+        uint8_t reg = USER_START_REG + userPagePtr;
 
-	uint8_t reg = USER_START_REG+userPagePtr;
+        if (reg > USER_END_REG) {
+                return false;
+        }
 
-	if (reg > USER_END_REG) {
-		return false;
-	}
+        bool ret =
+            writeBufferRegister(_address, reg, nfcPageBuffer, NFC_PAGE_SIZE);
+        if (ret)
+                usleep(100);    // give some time to NC for store the buffer
 
-    bool ret = writeBufferRegister(_address, reg, nfcPageBuffer, NFC_PAGE_SIZE);
-    if (ret)
-        delay(100); // give some time to NC for store the buffer
-
-    return ret;
+        return ret;
 }
-
 
 NT3H1101_C smeNfcDriver;
