@@ -4,10 +4,9 @@ VPATH=$(srcdir) $(builddir)
 lib_LTLIBRARIES = libnfctag.la
 
 libnfctag_la_CXXFLAGS = 				\
-        $(CE_COMMON_CXXFLAGS)                           \
-        $(CE_MODULE_CXXFLAGS)                           \
+	$(LIB_NFCTAG_CXXFLAGS)				\
         -I${srcdir}/..                                  \
-        -I${abs_srcdir}/.                                   \
+        -I${srcdir}/.                                   \
         -Wno-deprecated-declarations                    \
         -Wno-unused-parameter                           \
         -fPIC
@@ -23,10 +22,10 @@ libnfctag_la_SOURCES =					\
 	nfctag/ndef/rtd/nfcForum.h			\
 	nfctag/ndef/rtd/rtdTypes.h			\
 	nfctag/ndef/rtd/rtdText.h			\
-	nfctag/ndef/rtd/rtdUri.h			\
-	SmeNfc.h
+	nfctag/ndef/rtd/rtdUri.h
 
 
 nobase_include_HEADERS =				\
+	SmeNfc.h					\
 	nfctag/NT3H1101.h				\
 	nfctag/NT3H1101_model.h
