@@ -31,7 +31,7 @@
 #include <stdint-gcc.h>
 #include <stdbool.h>
 
-#include "rtdTypes.h"
+#include "nfctag/ndef/rtd/rtdTypes.h"
 
 #define NDEF_START_BYTE 0x03
 #define NDEF_END_BYTE 	0xFE

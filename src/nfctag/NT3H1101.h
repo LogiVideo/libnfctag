@@ -23,7 +23,8 @@
 #include "nfctag/NT3H1101_model.h"
 #include "SmeNfc.h"
 
-#define NXPNFC_ADDRESS 85       // 0x4 is the default for every NXP io ho visto 85
+#define NXPNFC_ADDRESS 0x55
+// TODO: make this an autoconf / automake variable
 
 #define MANUFACTURING_DATA_REG 0x0
 #define USER_START_REG 0x1

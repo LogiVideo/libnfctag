@@ -26,8 +26,8 @@
 #ifndef RTDTYPES_H_
 #define RTDTYPES_H_
 
-#include "rtdText.h"
-#include "rtdUri.h"
+#include "nfctag/ndef/rtd/rtdText.h"
+#include "nfctag/ndef/rtd/rtdUri.h"
 
 
 #define RTD_TEXT 'T'

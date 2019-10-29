@@ -19,6 +19,11 @@ libnfctag_la_SOURCES =					\
 	nfctag/ndef/rtd/nfcForum.cpp			\
 	nfctag/ndef/rtd/rtdText.cpp			\
 	nfctag/ndef/rtd/rtdUri.cpp			\
+	nfctag/ndef/ndef.h				\
+	nfctag/ndef/rtd/nfcForum.h			\
+	nfctag/ndef/rtd/rtdTypes.h			\
+	nfctag/ndef/rtd/rtdText.h			\
+	nfctag/ndef/rtd/rtdUri.h			\
 	SmeNfc.h
 
 
