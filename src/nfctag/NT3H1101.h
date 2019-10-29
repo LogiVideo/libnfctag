@@ -20,7 +20,7 @@
 #ifndef NT3H1101_h
 #define NT3H1101_h
 
-#include "nfc/NT3H1101_model.h"
+#include "nfctag/NT3H1101_model.h"
 #include "SmeNfc.h"
 
 #define NXPNFC_ADDRESS 85       // 0x4 is the default for every NXP io ho visto 85

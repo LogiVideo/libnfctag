@@ -30,7 +30,7 @@
 #define NFC_H_
 
 #include <stdint.h>
-#include "nfc/NT3H1101.h"
+#include "nfctag/NT3H1101.h"
 
 typedef enum {
         NDEFFirstPos,

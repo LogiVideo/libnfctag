@@ -90,12 +90,6 @@ static bool writeBufferRegister(uint8_t slaveAddress, uint8_t regToWrite,
 
         write_buffer[0] = regToWrite;
         memcpy(&write_buffer[1], dataToWrite, dataLen);
-        /*std::printf("i2ctransfer 2 w%d@0x%02x ", dataLen + 1, slaveAddress);
-        for (int i = 0; i < dataLen + 1; i++) {
-                std::printf("0x%02x ", write_buffer[i]);
-        }
-        std::printf("\n");
-        */
         Batch batch {
                 i2c_msg {
         slaveAddress, base_i2c_flags, ++dataLen, write_buffer}};
