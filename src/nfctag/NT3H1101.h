@@ -25,7 +25,7 @@
 #include "SmeNfc.h"
 
 #ifndef NXPNFC_ADDRESS
-#error No chip address specified
+#define NXPNFC_ADDRESS 0x55
 #endif
 
 #define MANUFACTURING_DATA_REG 0x0
@@ -38,7 +38,9 @@
 #define USER_END_REG   0x38     // just the first 8 bytes for the 1K
 #define CONFIG_REG	   0x3A
 #else
-#error NO NFC MODEL DEFINITION
+#warning Assuming NT3H1101 model
+#define USER_END_REG   0x38     // just the first 8 bytes for the 1K
+#define CONFIG_REG	   0x3A
 #endif
 
 #define SRAM_START_REG 0xF8
