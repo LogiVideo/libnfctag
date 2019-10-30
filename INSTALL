@@ -1,0 +1,23 @@
+This package is intended for a GNU/Linux based system and uses the autoconf /
+automake build system.
+
+Run the following commands to install:
+        autoreconf -i
+        ./configure
+        make
+        sudo make install
+
+The NT3H1101 device is expected to be on "/dev/i2c-0" at address 0x55. However,
+both of these can be changed with configure options:
+        --with-i2c-bus=<bus-number>
+allows you to specify the final number, e.g.
+        --with-i2c-bus-2
+will have the library open "/dev/i2c-2" to find the device.
+
+Similarly, the i2c address can be altered with
+        --with-i2c-address=<addr>
+NOTE: the actual i2c address is set by altering the first byte of the
+configuration page; the library currently does _not_ do this, and assumes that
+the address has already been set (e.g. by `i2c_transfer`) before using
+the library. This may change in a future release.
+
