@@ -28,7 +28,7 @@
 #ifndef  NFCFORUM_H_
 #define  NFCFORUM_H_
 
-#include <stdint-gcc.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #include "nfctag/ndef/rtd/rtdTypes.h"

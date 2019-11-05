@@ -20,7 +20,11 @@
 #ifndef NT3H1101_h
 #define NT3H1101_h
 
-#include "config.h"
+#if defined __has_include
+#  if __has_include ("nfctag_config.h")
+#    include "nfctag_config.h"
+#  endif
+#endif
 #include "nfctag/NT3H1101_model.h"
 #include "SmeNfc.h"
 

@@ -5,8 +5,8 @@
 .deps
 .dirstamp
 .*.sw?
+Makefile.in
 aclocal.m4
-*.in
 autom4te.*
 autoscan.log
 config.*

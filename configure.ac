@@ -48,7 +48,7 @@ LT_PREREQ([2.2.6])
 LT_INIT
 
 AC_CONFIG_SRCDIR([src/SmeNfc.h])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([nfctag_config.h])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -95,6 +95,7 @@ AC_SUBST(LIB_NFCTAG_LIBS, '${top_builddir}/src/libnfctag.la')
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 utils/Makefile])
+                 utils/Makefile
+                 src/libnfctag.pc])
 AC_OUTPUT
 

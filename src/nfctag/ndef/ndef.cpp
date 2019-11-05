@@ -29,6 +29,7 @@
 #include "../NT3H1101_model.h"
 #include "../NT3H1101.h"
 
+#include <cstdio>
 /*
  * This strucure is used in the ADD record functionality
  * to store the last nfc page information, in order to continue from that point.
@@ -60,6 +61,7 @@ static bool NT3HWriteUserData(uint8_t page, const uint8_t * data)
 
         ret = smeNfcDriver.writeUserPage(page, data);
         if (ret == false) {
+                std::fprintf(stderr, "NT3HWriteUserData(%d) failed\n", page);
                 errNo = NT3HERROR_WRITE_USER_MEMORY_PAGE;
                 goto end;
         }
@@ -294,7 +296,7 @@ static bool writeUserPayload(int16_t payloadPtr, const NDEFDataStr * data,
                         ret = NT3HWriteUserData(addPage->page, nfcPageBuffer);
 
                         if (ret == false) {
-                                errNo = NT3HERROR_WRITE_NDEF_TEXT;
+                                errNo = NT3HERROR_WRITE_NDEF_TEXT2;
                                 goto end;
                         }
                 } else {

@@ -56,6 +56,8 @@ using Batch = std::vector < i2c_msg >;
 
 static bool process_batch(Batch && batch)
 {
+        std::fprintf(stderr, "%s:Handling I2C batch of %ld messages on %s\n", __func__,
+                        batch.size(), i2c_device);
         if (!i2c_open(i2c_device))
                 return false;
         for (auto && msg:batch) {
@@ -74,12 +76,13 @@ static bool process_batch(Batch && batch)
                                 usleep(sleep_us);
                                 continue;
                         } else {
-                                std::printf("Failed: %m\n");
+                                std::fprintf(stderr, "i2c transfer failed: %m\n");
                                 return false;
                         }
                 }
 
                 if (!ok) {
+                        std::fprintf(stderr, "i2c transfer failed after many retries\n");
                         return false;
                 }
         }
@@ -96,7 +99,7 @@ static bool writeBufferRegister(uint8_t slaveAddress, uint8_t regToWrite,
         memcpy(&write_buffer[1], dataToWrite, dataLen);
         Batch batch {
                 i2c_msg {
-        slaveAddress, base_i2c_flags, ++dataLen, write_buffer}};
+                        slaveAddress, base_i2c_flags, ++dataLen, write_buffer}};
         return process_batch(std::move(batch));
 }
 
@@ -153,6 +156,7 @@ bool NT3H1101_C::writeUserPage(uint8_t userPagePtr,
 
         uint8_t reg = USER_START_REG + userPagePtr;
 
+        std::fprintf(stderr, "writeUserPage reg %d\n", reg);
         if (reg > USER_END_REG) {
                 return false;
         }

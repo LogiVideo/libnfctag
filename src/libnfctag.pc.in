@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: NT3H1x01 NFC Programmable Tag Library
+Version: @VERSION@
+Description: NFC I2C Tag Library
+URL: https://github.com/LogiVideo/libnfctag
+Cflags: -I@includedir@
+Libs: -lnfctag

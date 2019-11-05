@@ -24,6 +24,9 @@ libnfctag_la_SOURCES =					\
 	nfctag/ndef/rtd/rtdText.h			\
 	nfctag/ndef/rtd/rtdUri.h
 
+pkgconfigdir = $(libdir)/pkgconfig
+
+pkgconfig_DATA = libnfctag.pc
 
 nobase_include_HEADERS =				\
 	SmeNfc.h					\
