@@ -48,7 +48,7 @@ LT_PREREQ([2.2.6])
 LT_INIT
 
 AC_CONFIG_SRCDIR([src/SmeNfc.h])
-AC_CONFIG_HEADERS([nfctag_config.h])
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -75,20 +75,22 @@ AC_CHECK_FUNCS([memset])
 AC_ARG_ENABLE([2k],
             [AS_HELP_STRING([--enable-2k],
                             [Chip type is 'NT3H1201' and not 'NT3H1101'])],
-            AC_DEFINE([NT3H1201_DEF],[1],[Chip type is 2k]),
-            AC_DEFINE([NT3H1101_DEF],[1],[Chip type is 1k]))
+            AC_SUBST([NXPNCF_CHIP],[NT3H1201_DEF],[Chip type is 2k]),
+            AC_SUBST([NXPNCF_CHIP],[NT3H1101_DEF],[Chip type is 1k]))
 
 AC_ARG_WITH([i2c_bus],
             [AS_HELP_STRING([--with-i2c-bus=<bus-number>],
                             [I2C bus for chip (default 0)])],
-            AC_DEFINE([NXPNFC_BUS],[$with_val],[I2C bus to use]),
-            AC_DEFINE([NXPNFC_BUS],[0],[I2C bus to use]))
+            AC_SUBST([NXPNFC_BUS],[${with_i2c_bus}],[I2C bus to use]),
+            AC_SUBST([NXPNFC_BUS],[0],[I2C bus to use]))
 
 AC_ARG_WITH([i2c_address],
             [AS_HELP_STRING([--with-i2c-address=<addr>],
                             [I2C address for chip (default 0x55)])],
-            AC_DEFINE([NXPNFC_ADDRESS],[$with_val],[I2C address]),
-            AC_DEFINE([NXPNFC_ADDRESS],[0x55],[I2C address]))
+            AC_SUBST([NXPNFC_ADDRESS],[${with_i2c_address}],[I2C address]),
+            AC_SUBST([NXPNFC_ADDRESS],[0x55],[I2C address]))
+
+AC_SUBST([WARN_GENERATED],["Generated file, do not edit"])
 
 AC_SUBST(LIB_NFCTAG_CXXFLAGS, '-I${top_srcdir}/src')
 AC_SUBST(LIB_NFCTAG_LIBS, '${top_builddir}/src/libnfctag.la')
@@ -96,6 +98,7 @@ AC_SUBST(LIB_NFCTAG_LIBS, '${top_builddir}/src/libnfctag.la')
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  utils/Makefile
+		 src/SmeNfcConfig.h
                  src/libnfctag.pc])
 AC_OUTPUT
 

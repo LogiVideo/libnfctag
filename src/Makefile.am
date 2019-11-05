@@ -30,5 +30,6 @@ pkgconfig_DATA = libnfctag.pc
 
 nobase_include_HEADERS =				\
 	SmeNfc.h					\
+	SmeNfcConfig.h					\
 	nfctag/NT3H1101.h				\
 	nfctag/NT3H1101_model.h

@@ -21,3 +21,4 @@ stamp-h1
 Makefile
 *.*~
 libnfctag-*
+/src/SmeNfcConfig.h

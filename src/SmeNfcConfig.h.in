@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2019 Logitech, Inc.  All Rights Reserved
+ * This program is a trade secret of LOGITECH, and it is not to be reproduced,
+ * published, disclosed to others, copied, adapted, distributed or displayed
+ * without the prior authorization of LOGITECH.
+ *
+ * Licensee agrees to attach or embed this notice on all copies of the program,
+ * including partial copies or modified versions thereof.
+ *
+ * @WARN_GENERATED@
+ */
+
+#ifndef SME_NCF_CONFIG_H__
+#define SME_NCF_CONFIG_H__
+
+#define @NXPNCF_CHIP@   (1) /**< The Chip Type */
+#define NXPNFC_BUS     (@NXPNFC_BUS@) /**< The I2C Bus To Use */
+#define	NXPNFC_ADDRESS (@NXPNFC_ADDRESS@) /**< The I2C Address for the chip */
+
+#endif /*SME_NCF_CONFIG_H__*/
