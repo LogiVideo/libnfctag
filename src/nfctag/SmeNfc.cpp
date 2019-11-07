@@ -47,7 +47,7 @@ SmeNfc::storeUri(RecordPosEnu position, const char *uri)
     NDEFDataStr data;
     UriTypeE type = httpsWWW;
 
-    if (std::strstr(uri, "://") == nullptr) {
+    if (std::strstr(uri, "://") != nullptr) {
             type = freeForm;
     }
     prepareUri(&data, position, uri, type);
