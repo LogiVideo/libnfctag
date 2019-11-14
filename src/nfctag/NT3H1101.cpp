@@ -56,8 +56,6 @@ using Batch = std::vector < i2c_msg >;
 
 static bool process_batch(Batch && batch)
 {
-        std::fprintf(stderr, "%s:Handling I2C batch of %ld messages on %s\n", __func__,
-                        batch.size(), i2c_device);
         if (!i2c_open(i2c_device))
                 return false;
         for (auto && msg:batch) {
@@ -156,7 +154,6 @@ bool NT3H1101_C::writeUserPage(uint8_t userPagePtr,
 
         uint8_t reg = USER_START_REG + userPagePtr;
 
-        std::fprintf(stderr, "writeUserPage reg %d\n", reg);
         if (reg > USER_END_REG) {
                 return false;
         }
